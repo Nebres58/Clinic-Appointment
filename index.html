@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riverbend Clinic — Book an Appointment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 3C9 3 3 9 3 16s6 13 13 13 13-6 13-13S23 3 16 3z" stroke="currentColor" stroke-width="2"/>
+          <path d="M16 10v12M10 16h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="brand-name">Riverbend Clinic</span>
+    </div>
+    <nav class="main-nav" aria-label="Primary">
+      <button class="nav-btn is-active" data-view="book">Book Appointment</button>
+      <button class="nav-btn" data-view="my">My Appointments</button>
+      <button class="nav-btn" data-view="admin">Staff</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ BOOK VIEW ============ -->
+  <section id="view-book" class="view is-active">
+    <div class="view-header">
+      <p class="eyebrow">Schedule a visit</p>
+      <h1>Find your doctor, pick a time.</h1>
+      <p class="view-sub">Choose a department and doctor below. Each doctor's card shows how open their next five working days are before you pick a slot.</p>
+    </div>
+
+    <div class="book-layout">
+      <div class="book-browse">
+        <div class="dept-filter" id="deptFilter" role="tablist" aria-label="Filter by department"></div>
+        <div class="doctor-grid" id="doctorGrid"></div>
+      </div>
+
+      <aside class="book-panel" id="bookPanel">
+        <div class="panel-empty" id="panelEmpty">
+          <p>Select a doctor to see available times.</p>
+        </div>
+
+        <form id="bookForm" class="panel-form is-hidden" novalidate>
+          <div class="selected-doctor" id="selectedDoctorSummary"></div>
+
+          <div class="field">
+            <label for="apptDate">Date</label>
+            <input type="date" id="apptDate" name="date" required>
+            <p class="field-hint" id="dateHint"></p>
+          </div>
+
+          <div class="field">
+            <label>Time</label>
+            <div class="slot-grid" id="slotGrid">
+              <p class="slot-placeholder">Choose a date to see open times.</p>
+            </div>
+            <input type="hidden" id="apptTime" name="time" required>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="patientName">Full name</label>
+              <input type="text" id="patientName" name="patientName" required autocomplete="name">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="patientEmail">Email</label>
+              <input type="email" id="patientEmail" name="email" required autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="patientPhone">Phone</label>
+              <input type="tel" id="patientPhone" name="phone" required autocomplete="tel" placeholder="09XX XXX XXXX">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="visitReason">Reason for visit <span class="optional">(optional)</span></label>
+            <textarea id="visitReason" name="reason" rows="2" maxlength="200" placeholder="Brief note for the doctor"></textarea>
+          </div>
+
+          <p class="form-error" id="formError" role="alert"></p>
+
+          <button type="submit" class="btn btn-primary btn-block">Confirm appointment</button>
+        </form>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ MY APPOINTMENTS VIEW ============ -->
+  <section id="view-my" class="view">
+    <div class="view-header">
+      <p class="eyebrow">Manage your visits</p>
+      <h1>My appointments</h1>
+      <p class="view-sub">Look up your bookings with the email or phone number you used when scheduling.</p>
+    </div>
+
+    <form id="lookupForm" class="lookup-form">
+      <input type="text" id="lookupValue" placeholder="Email or phone number" required>
+      <button type="submit" class="btn btn-primary">Find my appointments</button>
+    </form>
+
+    <div id="lookupResults" class="lookup-results"></div>
+  </section>
+
+  <!-- ============ ADMIN VIEW ============ -->
+  <section id="view-admin" class="view">
+
+    <div id="adminGate" class="admin-gate">
+      <div class="view-header">
+        <p class="eyebrow">Staff only</p>
+        <h1>Front desk sign-in</h1>
+        <p class="view-sub">Enter the staff passcode to view and manage all appointments.</p>
+      </div>
+      <form id="adminLoginForm" class="admin-login-form">
+        <input type="password" id="adminPasscode" placeholder="Passcode" autocomplete="off" required>
+        <button type="submit" class="btn btn-primary">Sign in</button>
+      </form>
+      <p class="form-error" id="adminLoginError" role="alert"></p>
+      <p class="admin-hint">Demo passcode: <code>clinic2026</code>. This is a client-side demo lock only — swap in real authentication before handling real patient data.</p>
+    </div>
+
+    <div id="adminDashboard" class="admin-dashboard is-hidden">
+      <div class="view-header view-header-row">
+        <div>
+          <p class="eyebrow">Front desk</p>
+          <h1>All appointments</h1>
+        </div>
+        <button class="btn btn-ghost" id="adminLogoutBtn">Sign out</button>
+      </div>
+
+      <div class="stats-row" id="statsRow"></div>
+
+      <div class="admin-filters">
+        <div class="filter-field">
+          <label for="filterDate">Date</label>
+          <input type="date" id="filterDate">
+        </div>
+        <div class="filter-field">
+          <label for="filterDept">Department</label>
+          <select id="filterDept"><option value="">All departments</option></select>
+        </div>
+        <div class="filter-field">
+          <label for="filterDoctor">Doctor</label>
+          <select id="filterDoctor"><option value="">All doctors</option></select>
+        </div>
+        <div class="filter-field">
+          <label for="filterStatus">Status</label>
+          <select id="filterStatus">
+            <option value="">All statuses</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost" id="clearFiltersBtn">Clear</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Contact</th>
+              <th>Doctor</th>
+              <th>Department</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody"></tbody>
+        </table>
+        <p class="table-empty is-hidden" id="tableEmpty">No appointments match these filters.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Confirmation modal -->
+<div id="confirmModal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="modal">
+    <div class="modal-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="none"><path d="M4 12.5l5 5L20 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h2 id="confirmTitle">Appointment confirmed</h2>
+    <div class="modal-details" id="modalDetails"></div>
+    <p class="modal-id" id="modalApptId"></p>
+    <button class="btn btn-primary btn-block" id="modalCloseBtn">Done</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast is-hidden" role="status"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
